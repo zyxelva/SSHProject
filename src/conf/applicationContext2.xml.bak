@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd 
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd 
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd"
+	default-lazy-init="true"
+	default-autowire="byName">
+
+	<description>Spring公共配置</description>
+
+	<!-- 以静态变量保存Spring ApplicationContext,可在任意代码中取出ApplicaitonContext. -->
+	<!-- <bean name="springContextHolder" scope="singleton" lazy-init="false"
+		class="com.grgbanking.initialize.SpringContextHolder" /> -->
+
+	<!-- 使用annotation 自动注册bean,并保证@Required,@Autowired的属性被注入 -->
+	<context:component-scan base-package="com.grgbanking">
+		<!-- 注意 Controller由Spring mvc扫描 -->
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- <bean id="applicationContext" class="com.grgbanking.framework.initialize.applicationContext.SpringApplicationContextUtil"/> -->
+
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="filters" value="stat" />
+		<property name="maxActive" value="${jdbc.maxPoolSize}" />
+		<property name="initialSize" value="${jdbc.initialPoolSize}" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="1" />
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="poolPreparedStatements" value="true" />
+		<!-- 在mysql5.5以下的版本中没有PSCache功能 -->
+		<property name="maxPoolPreparedStatementPerConnectionSize"
+			value="200" />
+		<!-- 超过时间限制是否回收 对性能有少量影响，可以避免部分代码没有及时closeSession -->
+		<property name="removeAbandoned" value="true" />
+		<!-- 超时时间；单位为秒。180秒=3分钟 -->
+		<property name="removeAbandonedTimeout" value="180" />
+		<!-- 关闭abanded连接时输出错误日志 -->
+		<property name="logAbandoned" value="true" />
+	</bean>
+
+
+	<!-- 配置jdbc。properties的路径 -->
+	<!-- 引入jdbc配置文件 -->
+	<!-- 
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean> -->
+
+
+	 
+
+	<!-- Hibernate配置 -->
+ 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="namingStrategy">
+			<bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
+			<bean class="com.grgbanking.core.hibernate.cfg.GrgImprovedNamingStrategy" />
+		</property> -->
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">validation</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.connection.autocommit">true</prop>
+				<prop key="hibernate.connection.release_mode">after_transaction</prop>
+				<prop key="hibernate.connection.auto_close_session">true</prop>
+				<prop key="hibernate.use_sql_comments">false</prop>
+				<prop key="hibernate.max_fetch_depth">1</prop>
+				<prop key="hibernate.jdbc.fetch_size">200</prop>
+				<prop key="hibernate.default_schema">${jdbc.default_schema}</prop>
+				<!-- <prop key="hibernate.cache.provider_class"> org.hibernate.cache.EhCacheProvider </prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path"> ecacheConfig.xml</prop> -->
+				<prop key="hibernate.autoReconnect">${hibernate.autoReconnect}</prop>
+				<!-- <prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop> -->
+				<prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
+			</props>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.grgbanking.*</value>
+				 <value>com.grgbanking.**.entity</value>
+				<value>com.grgbanking.**.entity.**</value>
+				<value>com.grgbanking.*.entity.*</value>
+				
+			</list>
+		</property>
+	</bean>
+	
+	<!-- <bean id="BaseDao" class="com.grgbanking.test.BaseDao" scope="prototype"></bean> -->
+	<!-- 事务管理器配置,单数据源事务 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"
+		proxy-target-class="true" />
+		
+		<!-- 配置切面Bean -->
+    <bean id="helloWorldService" class="com.grgbanking.aop.HelloWorldServiceImpl" />
+
+    <bean id="helloWorldAspectBean" class="com.grgbanking.aop.HelloWorldAspect" />
+
+    <!-- 配置一个切面 -->
+    <aop:config>
+        <aop:aspect id="helloWorldAspect" ref="helloWorldAspectBean">
+            <aop:pointcut id="helloWorldServicePointcut" expression="execution(* com.grgbanking.aop.*.*(..))" />
+            <!-- 配置前置通知 -->
+            <aop:before pointcut-ref="helloWorldServicePointcut" method="beforeAdvice" />
+            <!-- 配置前置通知 -->
+            <aop:after pointcut-ref="helloWorldServicePointcut" method="afterAdvice" />
+            <!-- 配置后置返回通知 -->
+            <aop:after-returning pointcut-ref="helloWorldServicePointcut" method="afterReturnAdvice" returning="result" />
+            <!-- 配置环绕通知 -->
+            <aop:around pointcut-ref="helloWorldServicePointcut" method="aroundAdvice" />
+            <!-- 异常通知 -->
+            <aop:after-throwing pointcut-ref="helloWorldServicePointcut" method="throwingAdvice" throwing="e" />
+        </aop:aspect>
+    </aop:config>
+
+</beans>

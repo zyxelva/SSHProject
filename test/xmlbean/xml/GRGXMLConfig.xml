@@ -1,0 +1,19 @@
+<?xml version="1.0"		encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 2 U (http://www.xmlspy.com) by TEAM (RENEGADE) -->
+<ROOT> 
+<MSGS name="XML报文接口"	type="xml">  
+  <MSG name="0200报文"		msgType="0200"		xmlKey="devices">
+	  <field index="1"	alias="报文类型"		name="MsgType"				type="String"				   />
+	  <field index="2"	alias="报文版本 "		name="MsgVersion"			type="String"				   />
+	  <field index="3"	alias="设备标识"		name="TmlIdentifier"		type="String"				   />
+	  <field index="4"	alias="终端编号"		name="Termid"				type="String"				   />
+	  <field index="5"	alias="ATMC运行状态"	name="AtmcStatus"			type="Integer"				   />
+	  <field index="6"	alias="管理员信息"		name="AdminInfo"			type="String"				   />
+	  <field index="7"	alias="主控设备状态 "	name="Control"				type="String"				   />
+	  <field index="8"	alias="主控设备错误码"	name="ControlECode"			type="String"			   />
+	  <field index="9"	alias="出钞机芯状态"		name="OutCore"				type="String"			   />
+	  <field index="10"	alias="出钞机芯错误码"	name="OutCoreECode"			type="String"			   />
+	  <field index="11"	alias="主键"			name="Id"						type="String"				   />
+  </MSG>
+</MSGS>
+</ROOT>
