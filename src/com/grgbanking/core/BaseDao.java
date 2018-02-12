@@ -45,8 +45,6 @@ public class BaseDao implements IBaseDao {
 
     protected Session getSession() {
         Session session = null;
-        // SpringContextHolder.loadApplicationContext();
-        // setSessionFactory(SpringContextHolder.getBean("sessionFactory"));
         try {
             if (sessionFactory != null) {
                 session = sessionFactory.getCurrentSession();
@@ -149,14 +147,17 @@ public class BaseDao implements IBaseDao {
     public Object queryObject(String hql) {
         return queryObject(hql, null, null);
     }
+
     @Override
     public Object queryObject(String hql, Object arg) {
         return this.queryObject(hql, new Object[] { arg });
     }
+
     @Override
     public Object queryObject(String hql, Object[] args) {
         return this.queryObject(hql, args, null);
     }
+
     @Override
     public Object queryObject(String hql, Object[] args, Map<String, Object> alias) {
         Query query = getSession().createQuery(hql);
@@ -164,6 +165,7 @@ public class BaseDao implements IBaseDao {
         setParameter(query, args);
         return query.uniqueResult();
     }
+
     @Override
     public Object queryObjectByAlias(String hql, Map<String, Object> alias) {
         return this.queryObject(hql, null, alias);
@@ -185,7 +187,6 @@ public class BaseDao implements IBaseDao {
         }
     }
 
-
     private void setParameter(Query query, Object[] args) {
         if (args != null && args.length > 0) {
             int index = 0;
@@ -194,7 +195,6 @@ public class BaseDao implements IBaseDao {
             }
         }
     }
-
 
     @Resource
     public void setSessionFactory(SessionFactory sessionFactory) {
