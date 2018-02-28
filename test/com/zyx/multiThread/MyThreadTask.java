@@ -18,6 +18,7 @@ public class MyThreadTask extends RecursiveTask<Integer> {
     /**
      *
      */
+
     public MyThreadTask(int[] arr, int start, int end) {
         this.start = start;
         this.end = end;
@@ -61,6 +62,7 @@ public class MyThreadTask extends RecursiveTask<Integer> {
         Future<Integer> future = pool.submit(new MyThreadTask(array, 0, array.length));
         System.out.println("+++++++++++++++++分治后的计算结果：+++++++++++++++++++++++");
         System.out.println("total= " + future.get());
+
         pool.shutdown();
 
     }
