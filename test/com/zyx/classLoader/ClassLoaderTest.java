@@ -26,7 +26,11 @@
 
 package com.zyx.classLoader;
 
+import java.io.File;
 import java.net.URL;
+import java.util.StringTokenizer;
+
+import org.junit.Test;
 
 /**
  * @author KEN
@@ -47,6 +51,20 @@ public class ClassLoaderTest {
         clt.test();
     }
 
+    private File[] getClassPath(String s) {
+        File[] dirs = null;
+        if (null != s) {
+            StringTokenizer st = new StringTokenizer(s, File.pathSeparator);
+            int count = st.countTokens();
+            dirs = new File[count];
+            for (int i = 0; i < count; i++) {
+                dirs[i] = new File(st.nextToken());
+            }
+        }
+        return dirs;
+    }
+
+    @Test
     public void test() {
         ClassLoader fatherLoader = this.getClass().getClassLoader();
         System.out.println("当前类的父加载器名称：" + fatherLoader.getClass().getName());
@@ -58,18 +76,48 @@ public class ClassLoaderTest {
 
         ClassLoader grandfatherLoader = fatherLoader.getParent();
         System.out.println("爷爷载器名称：" + grandfatherLoader.getClass().getName());
+    }
 
-        System.out.println("++++++++++++++++++BootstrapClassPath+++++++++++++++++");
+    @Test
+    public void getBootstrapClassLoaderPath() {
+        System.out.println("++++++++++++++++++bootstrap classload 方法一：----------------------");
+        final String s = System.getProperty("sun.boot.class.path");
+        System.out.println(s);
+        final File[] path = (s == null) ? new File[0] : getClassPath(s);
+        for (File f : path) {
+            System.out.println(f);
+        }
+
+        System.out.println("++++++++++++++++++BootstrapClassPath 方法二：+++++++++++++++++");
         URL[] urls = sun.misc.Launcher.getBootstrapClassPath().getURLs();
         for (int i = 0; i < urls.length; i++) {
             System.out.println(urls[i].toExternalForm());
         }
+    }
 
-//        System.out.println("++++++++++++++++++ExtClassLoaderPath+++++++++++++++++");
-//        URL[] urls = new sun.misc.Launcher().new Ext;
-//        for (int i = 0; i < urls.length; i++) {
-//            System.out.println(urls[i].toExternalForm());
-//        }
+    @Test
+    public void getAppClassLoaderPath() {
+        System.out.println("app classload----------------------");
+        final String s = System.getProperty("java.class.path");
+        // System.out.println(s);
+        final File[] path = (s == null) ? new File[0] : getClassPath(s);
+        for (File f : path) {
+            System.out.println(f);
+        }
+    }
+
+    @Test
+    public void getExtClassLoaderPath() {
+        System.out.println("ext classload----------------------");
+        final String s = System.getProperty("java.ext.dirs");// 对应路径
+        //System.out.println(s);
+
+        final File[] dirs = (s == null) ? new File[0] : getClassPath(s);
+
+        for (File f : dirs) {
+//             System.out.println(f.getAbsolutePath());
+            System.out.println(f);
+        }
     }
 
 }
