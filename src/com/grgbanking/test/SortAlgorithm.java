@@ -1,28 +1,4 @@
-/**
- *
- * <p>
- * Title: SortAlgorithm.java
- * </p>
- *
- * <p>
- * Description:
- * </p>
- *
- * <p>
- * Copyright: Copyright (c) 2017
- * </p>
- *
- * <p>
- * Company: zyx@taeyeon.cn
- * </p>
- *
- * @author KEN
- *
- * @date 2018年2月25日
- *
- * @version 1.0
- *
- */
+
 
 package com.grgbanking.test;
 
@@ -189,6 +165,32 @@ public class SortAlgorithm {
         }
     }
 
+    public void  ShellSort(int[] list){
+        if(null==list||list.length<=1) {
+            return;
+        }
+        int i;
+        int j;
+        int dk=0;
+        int temp=0;
+        int len=list.length;
+        while(dk<len){
+            dk=3*dk+1;
+        }
+
+        while(dk>0){
+            for( i=dk;i<len;i++){
+                temp=list[i];
+                for( j=i-dk;j>=0&&list[j]>temp;j-=dk){
+                    list[j+dk]=list[j];
+                }
+                list[j+dk]=temp;
+            }
+            dk=(dk-1)/3;
+        }
+
+    }
+
     public static void main(String[] args) {
         int[] list = { 4, 7, 3, 8, 2, 9, 0, 1, 5, 6 };
         SortAlgorithm sa = new SortAlgorithm();
@@ -198,8 +200,13 @@ public class SortAlgorithm {
         System.out.println();
         // sa.QuickSort(list);
         // sa.HeapSort(list);
-        sa.MergeSort(list);
+        //sa.MergeSort(list);
+        sa.ShellSort(list);
         sa.PrintList(list);
+
+
+//        Set<String> sets=new Set<String>();
+//        Queue queue=new Queue<>();
 
     }
 
