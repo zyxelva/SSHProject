@@ -33,6 +33,8 @@ public class RedisKeyJava {
       System.out.println("Connection to server sucessfully");
       //store data in redis list
       // Get the stored data and print it
+     // jedis.set("zyx", "1", "NX", "EX", 10);
+
       Set<String> sets = jedis.keys("*");
 
       for (String value:sets) {

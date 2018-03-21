@@ -35,6 +35,7 @@ public class RedisJava {
       jedis.set("tutorial-name", "Redis tutorial");
       // Get the stored data and print it
       System.out.println("Stored string in redis: "+ jedis.get("tutorial-name"));
+      System.out.println("Stored string in redis: "+ jedis.get("*"));
    }
 }
 
