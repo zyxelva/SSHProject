@@ -26,8 +26,7 @@
 	<!-- <bean id="applicationContext" class="com.grgbanking.framework.initialize.applicationContext.SpringApplicationContextUtil"/> -->
 
 	<context:property-placeholder location="classpath:jdbc.properties"/>
-	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
-		init-method="init" destroy-method="close">
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driver}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
@@ -53,7 +52,44 @@
 		<!-- 关闭abanded连接时输出错误日志 -->
 		<property name="logAbandoned" value="true" />
 	</bean>
+	
+	<bean id="slaveDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${slaveJdbc.driver}" />
+		<property name="url" value="${slaveJdbc.url}" />
+		<property name="username" value="${slaveJdbc.username}" />
+		<property name="password" value="${slaveJdbc.password}" />
+		<property name="filters" value="stat" />
+		<property name="maxActive" value="${slaveJdbc.maxPoolSize}" />
+		<property name="initialSize" value="${slaveJdbc.initialPoolSize}" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="1" />
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="poolPreparedStatements" value="true" />
+		<!-- 在mysql5.5以下的版本中没有PSCache功能 -->
+		<property name="maxPoolPreparedStatementPerConnectionSize"
+			value="200" />
+		<!-- 超过时间限制是否回收 对性能有少量影响，可以避免部分代码没有及时closeSession -->
+		<property name="removeAbandoned" value="true" />
+		<!-- 超时时间；单位为秒。180秒=3分钟 -->
+		<property name="removeAbandonedTimeout" value="180" />
+		<!-- 关闭abanded连接时输出错误日志 -->
+		<property name="logAbandoned" value="true" />
+	</bean>
 
+
+	<bean id="multipleDataSource" class="com.grgbanking.db.MultipleDataSource">
+		<property name="defaultTargetDataSource" ref="dataSource" />
+		<property name="targetDataSources">
+			<map>
+				<entry key="masterDataSource" value-ref="dataSource" />
+				<entry key="slaveDataSource" value-ref="slaveDataSource" />
+			</map>
+		</property>
+	</bean>
 
 	<!-- 配置jdbc。properties的路径 -->
 	<!-- 引入jdbc配置文件 -->
@@ -73,7 +109,7 @@
 
 	<!-- Hibernate配置 -->
  	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="multipleDataSource" />
 		<!-- <property name="namingStrategy">
 			<bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
 			<bean class="com.grgbanking.core.hibernate.cfg.GrgImprovedNamingStrategy" />
@@ -112,15 +148,21 @@
 	</bean>
 	
 	<!-- <bean id="BaseDao" class="com.grgbanking.test.BaseDao" scope="prototype"></bean> -->
+	
+	<!-- http://blog.csdn.net/gaofuqi/article/details/46417281
+	http://blog.csdn.net/johnf_nash/article/details/63260561 -->
+	
 	<!-- 事务管理器配置,单数据源事务 -->
-	<bean id="transactionManager"
-		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+	<!-- <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean> -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="multipleDataSource" />
 	</bean>
 	
 	<!-- 使用annotation定义事务 -->
-	<tx:annotation-driven transaction-manager="transactionManager"
-		proxy-target-class="true" />
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
 		
 	<!-- 配置切面Bean -->
 	<bean id="InitEntityPropertyAspect" class="com.grgbanking.initialize.InitEntityPropertyAspect"></bean>

@@ -2,7 +2,7 @@
 <BEAN name="XML报文接口"	type="xml" package="my.taeyeon.xmlbean.entity" className="GrgBean">
 	<field length="19" alias="主账号" name="pan" type="String" />
 	<field length="6"    alias="交易处理码" name="process_code" type="String" />
-	<field length="12"   alias="交易金额" name="txn_amount" type="BigDecimal" />
+	<field length="12"   alias="交易金额" name="txn_amount" type="BigInteger" />
 	<field length="12"   alias="清算金额" name="sett_amount" type="BigDecimal" />
 	<field length="12"   alias="持卡人签单金额" name="bill_amount" type="BigDecimal" />
 	<field length="10"   alias="传输日期和时间" name="txn_datetime" type="String" />

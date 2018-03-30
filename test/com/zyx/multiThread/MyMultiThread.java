@@ -35,23 +35,6 @@ import java.util.concurrent.Executors;
  */
 public class MyMultiThread {
 
-    /**
-     *
-     *
-     * <p>
-     * Title: main
-     * </p>
-     *
-     *
-     * <p>
-     * Description:
-     * </p>
-     *
-     *
-     * @param args
-     *
-     *
-     */
 
     public static void main(String[] args) {
 
@@ -68,7 +51,7 @@ public class MyMultiThread {
         threadPool.submit(target);
 
         threadPool.shutdown();
-
+        
     }
 
 }
